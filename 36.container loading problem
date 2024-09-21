@@ -1,0 +1,72 @@
+#include <stdio.h>
+#include <stdbool.h>
+#define CONTAINER_WIDTH  10
+#define CONTAINER_HEIGHT 10
+#define CONTAINER_DEPTH  10
+typedef struct {
+    int width;
+    int height;
+    int depth;
+} Box;
+bool canPlace(Box container[CONTAINER_WIDTH][CONTAINER_HEIGHT][CONTAINER_DEPTH], Box box, int x, int y, int z) {
+    if (x + box.width > CONTAINER_WIDTH || y + box.height > CONTAINER_HEIGHT || z + box.depth > CONTAINER_DEPTH)
+        return false;
+    for (int i = x; i < x + box.width; i++) {
+        for (int j = y; j < y + box.height; j++) {
+            for (int k = z; k < z + box.depth; k++) {
+                if (container[i][j][k].width != 0)
+                    return false;
+            }
+        }
+    }
+    return true;
+}
+void placeBox(Box container[CONTAINER_WIDTH][CONTAINER_HEIGHT][CONTAINER_DEPTH], Box box, int x, int y, int z) {
+    for (int i = x; i < x + box.width; i++) {
+        for (int j = y; j < y + box.height; j++) {
+            for (int k = z; k < z + box.depth; k++) {
+                container[i][j][k] = box;
+            }
+        }
+    }
+}
+bool loadContainer(Box container[CONTAINER_WIDTH][CONTAINER_HEIGHT][CONTAINER_DEPTH], Box boxes[], int n) {
+    for (int i = 0; i < n; i++) {
+        bool placed = false;
+        for (int x = 0; x < CONTAINER_WIDTH && !placed; x++) {
+            for (int y = 0; y < CONTAINER_HEIGHT && !placed; y++) {
+                for (int z = 0; z < CONTAINER_DEPTH && !placed; z++) {
+                    if (canPlace(container, boxes[i], x, y, z)) {
+                        placeBox(container, boxes[i], x, y, z);
+                        placed = true;
+                    }
+                }
+            }
+        }
+        if (!placed) {
+            printf("Box %d could not be placed in the container.\n", i);
+            return false;
+        }
+    }
+    return true;
+}
+int main() {
+    Box container[CONTAINER_WIDTH][CONTAINER_HEIGHT][CONTAINER_DEPTH] = {0};
+    Box boxes[] = {
+        {3, 3, 3},
+        {4, 4, 4},
+        {2, 2, 2},
+        {1, 1, 1}
+    };
+    int n = sizeof(boxes) / sizeof(boxes[0]);
+
+    if (loadContainer(container, boxes, n)) {
+        printf("All boxes were successfully placed in the container.\n");
+    } else {
+        printf("Some boxes could not be placed in the container.\n");
+    }
+
+    return 0;
+}
+output
+All boxes were successfully placed in the container.
